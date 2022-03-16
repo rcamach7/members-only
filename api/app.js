@@ -34,13 +34,11 @@ passport.use(
   new LocalStrategy((username, password, done) => {
     User.findOne({ username: username }, (err, user) => {
       // Error occurred in our search
-      if (err) {
-        return done(err);
-      }
+      if (err) return done(err);
 
       // Validates username
       if (!user) {
-        return done(null, false, { message: "Incorrect username" });
+        return done(null, false);
       }
 
       // Validates password
@@ -50,7 +48,7 @@ passport.use(
           return done(null, user);
         } else {
           // passwords do not match
-          return done(null, false, { message: "Incorrect password" });
+          return done(null, false);
         }
       });
 
@@ -70,8 +68,8 @@ passport.deserializeUser(function (id, done) {
 });
 
 // Define Routes
-app.use("/user", userRoutes);
-app.usr("/post", postRoutes);
+app.use("/users", userRoutes);
+app.use("/posts", postRoutes);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

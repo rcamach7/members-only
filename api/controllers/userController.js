@@ -8,6 +8,8 @@ exports.get_user = (req, res, next) => {
   res.json({ user: req.user });
 };
 
+// Creates a user, by being given everything in the body
+// Membership is by default set to false on all new accounts.
 exports.create_user_post = [
   // Data sanitation
   body("username", "Please provide an make")
@@ -32,21 +34,27 @@ exports.create_user_post = [
       const user = new User({
         username: req.body.username,
         password: hashedPassword,
+        fullName: req.body.fullName,
+        membership: false,
       });
       user.save((err) => {
         if (err) next(err);
 
-        res.redirect("/");
+        res.json(user);
       });
     });
   },
 ];
 
-exports.log_in_post = passport.authenticate("local", {
-  successRedirect: "/",
-  failureRedirect: "/",
-});
+// Attempts to log in with provided username and password.
+exports.log_in_post = [
+  passport.authenticate("local"),
+  function (req, res) {
+    res.redirect("/");
+  },
+];
 
+// Logs user out, without providing any params or body information.
 exports.log_out_get = (req, res) => {
   req.logout();
   res.redirect("/");
