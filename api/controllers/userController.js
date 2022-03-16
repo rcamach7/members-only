@@ -1,7 +1,7 @@
 const User = require("../models/User");
 const passport = require("passport");
 const bcrypt = require("bcryptjs");
-const { check, validationResult, body } = require("express-validator");
+const { check, validationResult } = require("express-validator");
 
 // If signed in, will return the user information
 exports.get_user = (req, res, next) => {

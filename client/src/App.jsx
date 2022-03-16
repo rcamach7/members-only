@@ -1,8 +1,9 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import "./scss/App.scss";
 import SignIn from "./components/SignIn";
 import SignUp from "./components/SignUp";
 import AccessForm from "./components/AccessForm";
+import PostForm from "./components/PostForm";
 import axios from "axios";
 
 function App() {
@@ -10,6 +11,7 @@ function App() {
   const [showSignInForm, setShowSignInForm] = useState(false);
   const [showSignUpForm, setShowSignUpForm] = useState(false);
   const [showAccessForm, setShowAccessForm] = useState(false);
+  const [showPostForm, setShowPostForm] = useState(false);
 
   // On boot up - retrieve user if he's signed in.
   useEffect(() => {
@@ -33,6 +35,7 @@ function App() {
       </header>
       <main>
         <aside className="sideBar">
+          {/* No user signed in buttons */}
           {user ? null : (
             <button onClick={() => setShowSignInForm(true)}>Sign In</button>
           )}
@@ -41,21 +44,36 @@ function App() {
               Create Account
             </button>
           )}
+
+          {/* User signed in buttons */}
           {user ? (
             <button onClick={() => handleSignOut()}>Sign Out</button>
           ) : null}
-
           {user && !user.membership ? (
             <button onClick={() => setShowAccessForm(true)}>
               Enter Access Code
             </button>
           ) : null}
+          {user && user.membership ? (
+            <button onClick={() => setShowPostForm(true)}>New Post</button>
+          ) : null}
         </aside>
 
         <aside className="mainContent">
-          <h2>{user ? `Hello ${user.fullName}` : "Please sign in"}</h2>
+          <div className="userInformation">
+            {user ? (
+              <React.Fragment>
+                <h1>{`Hello ${user.fullName}`}</h1>
+                <h2>
+                  Membership status: {user.membership ? "Active" : "Inactive"}
+                </h2>
+              </React.Fragment>
+            ) : (
+              <h1>Please sign in</h1>
+            )}
+          </div>
 
-          <div className="messageContainer">Messages Go Here</div>
+          <div className="messageContainer"></div>
         </aside>
       </main>
       {/* Form Components */}
@@ -64,6 +82,7 @@ function App() {
       {showAccessForm ? (
         <AccessForm _id={user._id} setShowAccessForm={setShowAccessForm} />
       ) : null}
+      {showPostForm ? <PostForm setShowPostForm={setShowPostForm} /> : null}
     </div>
   );
 }
