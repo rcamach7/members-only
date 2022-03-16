@@ -8,9 +8,18 @@ function SignUp(props) {
     password: "",
     fullName: "",
   });
+  const [errors, setErrors] = useState([]);
 
   const handleSubmit = (e) => {
-    axios.post("/users/sign-up", newAccount);
+    e.preventDefault();
+    axios.post("/users/sign-up", newAccount).then((results) => {
+      // If errors are returned, print them.
+      if (results.data.errors) {
+        setErrors(results.data.errors);
+      } else {
+        window.location.reload();
+      }
+    });
   };
 
   return (
@@ -33,6 +42,8 @@ function SignUp(props) {
           onChange={(e) =>
             setNewAccount({ ...newAccount, [e.target.id]: e.target.value })
           }
+          minLength="5"
+          maxLength="100"
           required
         />
 
@@ -44,6 +55,8 @@ function SignUp(props) {
           onChange={(e) =>
             setNewAccount({ ...newAccount, [e.target.id]: e.target.value })
           }
+          minLength="5"
+          maxLength="100"
           required
         />
 
@@ -54,7 +67,18 @@ function SignUp(props) {
           onChange={(e) =>
             setNewAccount({ ...newAccount, [e.target.id]: e.target.value })
           }
+          minLength="5"
+          maxLength="100"
+          required
         />
+        {/* Display any returned errors from out API */}
+        {errors.map((error, i) => {
+          return (
+            <p key={i} style={{ color: "red", fontSize: "14px" }}>
+              {error.msg}
+            </p>
+          );
+        })}
 
         <br />
         <input className="btn" type="submit" value="Create Account" />

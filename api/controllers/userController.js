@@ -1,7 +1,7 @@
 const User = require("../models/User");
 const passport = require("passport");
 const bcrypt = require("bcryptjs");
-const { body, validationResult } = require("express-validator");
+const { check, validationResult } = require("express-validator");
 
 // If signed in, will return the user information
 exports.get_user = (req, res, next) => {
@@ -12,20 +12,38 @@ exports.get_user = (req, res, next) => {
 // Membership is by default set to false on all new accounts.
 exports.create_user_post = [
   // Data sanitation
-  body("username", "Please provide an make")
+  check("username")
+    .exists()
+    .bail()
     .trim()
-    .isLength({ min: 1 })
-    .escape(),
-  body("password", "Please provide a password").trim().escape(),
-  body("fullName", "Please provide a name")
+    .isLength({ min: 5 })
+    .withMessage("Username must have at least 5 characters")
+    .custom((value) => {
+      // Makes sure the username is not already in use by another member
+      return User.findOne({ username: value }).then((user) => {
+        if (user) {
+          return Promise.reject("Username Already Exists");
+        }
+      });
+    })
+    .withMessage("Username already in use"),
+  check("password")
+    .exists()
+    .bail()
     .trim()
-    .isLength({ min: 1 })
-    .escape(),
+    .isLength({ min: 5 })
+    .withMessage("Password must have at least 5 characters"),
+  check("fullName")
+    .exists()
+    .bail()
+    .trim()
+    .isLength({ min: 5 })
+    .withMessage("Name must have at least 5 characters"),
   (req, res, next) => {
     // If data is not validated, send back list of errors.
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      res.send(errors);
+      return res.json(errors);
     }
     // Process user sign up
     bcrypt.hash(req.body.password, 10, (err, hashedPassword) => {
@@ -40,7 +58,12 @@ exports.create_user_post = [
       user.save((err) => {
         if (err) next(err);
 
-        res.json(user);
+        // Log in user after account creation
+        req.logIn(user, (err) => {
+          if (err) next(err);
+
+          res.json(user);
+        });
       });
     });
   },

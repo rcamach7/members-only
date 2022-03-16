@@ -32,6 +32,8 @@ function SignIn(props) {
           onChange={(e) =>
             setAccount({ ...account, [e.target.id]: e.target.value })
           }
+          minLength="5"
+          maxLength="100"
           required
         />
 
@@ -42,6 +44,8 @@ function SignIn(props) {
           onChange={(e) =>
             setAccount({ ...account, [e.target.id]: e.target.value })
           }
+          minLength="5"
+          maxLength="100"
           required
         />
 
