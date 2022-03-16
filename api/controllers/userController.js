@@ -71,7 +71,29 @@ exports.create_user_post = [
 
 // Attempts to log in with provided username and password.
 exports.log_in_post = [
-  passport.authenticate("local"),
+  check("username")
+    .exists()
+    .bail()
+    .trim()
+    .isLength({ min: 5 })
+    .withMessage("Username must have at least 5 characters"),
+  check("password")
+    .exists()
+    .bail()
+    .trim()
+    .isLength({ min: 5 })
+    .withMessage("Password must have at least 5 characters"),
+  (req, res, next) => {
+    // Checks validation results, and returns errors, if any, if not it moves on to authentication.
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.json(errors);
+    }
+    next();
+  },
+  passport.authenticate("local", {
+    failureMessage: true,
+  }),
   function (req, res) {
     res.redirect("/");
   },

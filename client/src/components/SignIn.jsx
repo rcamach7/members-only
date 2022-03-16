@@ -7,6 +7,19 @@ function SignIn(props) {
     password: "",
   });
 
+  const [badCredentials, setBadCredentials] = useState(null);
+
+  // Intercept 401 - bad login credentials
+  axios.interceptors.response.use(
+    function (response) {
+      return response;
+    },
+    function (error) {
+      setBadCredentials(true);
+      return Promise.reject(error);
+    }
+  );
+
   const handleSubmit = (e) => {
     e.preventDefault();
     axios.post("/users/log-in", account).then(() => {
@@ -48,6 +61,10 @@ function SignIn(props) {
           maxLength="100"
           required
         />
+        {/* Show any errors returned by the API */}
+        {badCredentials ? (
+          <p style={{ color: "red", fontSize: "13px" }}>No user found</p>
+        ) : null}
 
         <input type="submit" className="btn" style={{ marginTop: "auto" }} />
       </form>
