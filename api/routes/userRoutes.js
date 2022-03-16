@@ -12,4 +12,6 @@ router.post("/log-in/", userController.log_in_post);
 
 router.get("/log-out", userController.log_out_get);
 
+router.put("/membership/:id/put", userController.membership_access_put);
+
 module.exports = router;

@@ -1,7 +1,7 @@
 const User = require("../models/User");
 const passport = require("passport");
 const bcrypt = require("bcryptjs");
-const { check, validationResult } = require("express-validator");
+const { check, validationResult, body } = require("express-validator");
 
 // If signed in, will return the user information
 exports.get_user = (req, res, next) => {
@@ -104,3 +104,32 @@ exports.log_out_get = (req, res) => {
   req.logout();
   res.redirect("/");
 };
+
+// Gives membership status of true, if access code is correct. Requires ID of user in params.
+exports.membership_access_put = [
+  check("accessCode")
+    .exists()
+    .bail()
+    .trim()
+    .isLength({ min: 1 })
+    .withMessage("Enter value greater than 1 character")
+    .toLowerCase()
+    .matches("odin")
+    .withMessage("Access code not correct"),
+  (req, res, next) => {
+    // If data did not pass validation, return errors
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.json(errors);
+    }
+
+    // If no errors, update membership status to active.
+    User.findByIdAndUpdate(req.params.id, { $set: { membership: true } }).exec(
+      (err, result) => {
+        if (err) next(err);
+
+        res.json({ msg: "Success" });
+      }
+    );
+  },
+];

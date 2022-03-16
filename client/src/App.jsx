@@ -2,12 +2,14 @@ import { useState, useEffect } from "react";
 import "./scss/App.scss";
 import SignIn from "./components/SignIn";
 import SignUp from "./components/SignUp";
+import AccessForm from "./components/AccessForm";
 import axios from "axios";
 
 function App() {
   const [user, setUser] = useState(null);
   const [showSignInForm, setShowSignInForm] = useState(false);
   const [showSignUpForm, setShowSignUpForm] = useState(false);
+  const [showAccessForm, setShowAccessForm] = useState(false);
 
   // On boot up - retrieve user if he's signed in.
   useEffect(() => {
@@ -42,6 +44,12 @@ function App() {
           {user ? (
             <button onClick={() => handleSignOut()}>Sign Out</button>
           ) : null}
+
+          {user && !user.membership ? (
+            <button onClick={() => setShowAccessForm(true)}>
+              Enter Access Code
+            </button>
+          ) : null}
         </aside>
 
         <aside className="mainContent">
@@ -53,6 +61,9 @@ function App() {
       {/* Form Components */}
       {showSignInForm ? <SignIn setShowSignInForm={setShowSignInForm} /> : null}
       {showSignUpForm ? <SignUp setShowSignUpForm={setShowSignUpForm} /> : null}
+      {showAccessForm ? (
+        <AccessForm _id={user._id} setShowAccessForm={setShowAccessForm} />
+      ) : null}
     </div>
   );
 }
