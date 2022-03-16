@@ -1,12 +1,29 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "./scss/App.scss";
 import SignIn from "./components/SignIn";
 import SignUp from "./components/SignUp";
+import axios from "axios";
 
 function App() {
   const [user, setUser] = useState(null);
   const [showSignInForm, setShowSignInForm] = useState(false);
   const [showSignUpForm, setShowSignUpForm] = useState(false);
+
+  // On boot up - retrieve user if he's signed in.
+  useEffect(() => {
+    axios.get("/users/").then((results) => {
+      if (results.data.user !== undefined) {
+        setUser(results.data.user);
+      }
+    });
+  }, []);
+
+  const handleSignOut = () => {
+    axios.get("/users/log-out").then(() => {
+      window.location.reload();
+    });
+  };
+
   return (
     <div className="App">
       <header>
@@ -14,22 +31,28 @@ function App() {
       </header>
       <main>
         <aside className="sideBar">
-          <button onClick={() => setShowSignInForm(true)}>Sign In</button>
-          <button onClick={() => setShowSignUpForm(true)}>
-            Create Account
-          </button>
-          {user ? <button>Sign Out</button> : null}
+          {user ? null : (
+            <button onClick={() => setShowSignInForm(true)}>Sign In</button>
+          )}
+          {user ? null : (
+            <button onClick={() => setShowSignUpForm(true)}>
+              Create Account
+            </button>
+          )}
+          {user ? (
+            <button onClick={() => handleSignOut()}>Sign Out</button>
+          ) : null}
         </aside>
 
         <aside className="mainContent">
-          <h2>{user ? `Hello ${user.name}` : "Please sign in"}</h2>
+          <h2>{user ? `Hello ${user.fullName}` : "Please sign in"}</h2>
 
           <div className="messageContainer">Messages Go Here</div>
         </aside>
       </main>
       {/* Form Components */}
-      {showSignInForm ? <SignIn /> : null}
-      {showSignUpForm ? <SignUp /> : null}
+      {showSignInForm ? <SignIn setShowSignInForm={setShowSignInForm} /> : null}
+      {showSignUpForm ? <SignUp setShowSignUpForm={setShowSignUpForm} /> : null}
     </div>
   );
 }

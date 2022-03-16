@@ -50,5 +50,33 @@
     height: 100vh;
     width: 100vw;
     background-color: rgb(189, 189, 189, 0.8);
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    .SignUp,
+    .SignIn {
+      width: fit-content;
+      height: 250px;
+
+      padding: 10px;
+      text-align: center;
+      background-color: white;
+      border-radius: 5px;
+
+      display: flex;
+      flex-direction: column;
+    }
+
+    .close-icon {
+      cursor: pointer;
+      margin-left: auto;
+    }
+    .btn {
+      background-color: rgb(113, 113, 255);
+      color: white;
+      padding: 3px;
+      border: none;
+    }
   }
 }
