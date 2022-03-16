@@ -4,4 +4,7 @@ const router = express.Router();
 // Import Controllers
 const postController = require("../controllers/postController");
 
+// Get all posts, only if user is logged in, and membership status is active.
+router.get("/", postController.posts_get);
+
 module.exports = router;
