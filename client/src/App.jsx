@@ -8,6 +8,8 @@ import axios from "axios";
 
 function App() {
   const [user, setUser] = useState(null);
+  const [posts, setPosts] = useState([]);
+
   const [showSignInForm, setShowSignInForm] = useState(false);
   const [showSignUpForm, setShowSignUpForm] = useState(false);
   const [showAccessForm, setShowAccessForm] = useState(false);
@@ -21,6 +23,16 @@ function App() {
       }
     });
   }, []);
+
+  useEffect(() => {
+    if (user) {
+      if (user.membership) {
+        axios.get("/posts/").then((result) => {
+          setPosts(result.data);
+        });
+      }
+    }
+  }, [user]);
 
   const handleSignOut = () => {
     axios.get("/users/log-out").then(() => {
@@ -73,7 +85,17 @@ function App() {
             )}
           </div>
 
-          <div className="messageContainer"></div>
+          <div className="messageContainer">
+            {posts.map((post, i) => {
+              return (
+                <div key={i} className="Post">
+                  <p style={{ fontWeight: "bold" }}>{post.title}</p>
+                  <p>{post.message}</p>
+                  <p style={{ marginLeft: "auto" }}>- {post.author.fullName}</p>
+                </div>
+              );
+            })}
+          </div>
         </aside>
       </main>
       {/* Form Components */}

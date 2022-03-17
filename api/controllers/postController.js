@@ -10,11 +10,13 @@ exports.posts_get = (req, res, next) => {
     // Membership is not active, we do not retrieve posts.
     res.status(403).end();
   } else {
-    Post.find().exec((err, results) => {
-      if (err) next(err);
+    Post.find()
+      .populate("author", "fullName")
+      .exec((err, results) => {
+        if (err) next(err);
 
-      res.json(results);
-    });
+        res.json(results);
+      });
   }
 };
 
